@@ -27,7 +27,7 @@ from rest_framework.permissions import IsAdminUser
 
 from nxtbn.admin_schema import admin_schema
 from nxtbn.storefront_schema import storefront_schema
-from nxtbn.swagger_views import DASHBOARD_API_DOCS_SCHEMA_VIEWS, STOREFRONT_API_DOCS_SCHEMA_VIEWS, api_docs
+
 
 
 
@@ -42,9 +42,9 @@ if getattr(settings, 'DEVELOPMENT_SERVER') and not getattr(settings, 'DEBUG'):
 
 
 # Admin placeholder change
-admin.site.site_header = "nxtbn"
-admin.site.site_title = "nxtbn Admin Panel"
-admin.site.index_title = "nxtbn Admin"
+admin.site.site_header = "My Brand"
+admin.site.site_title = "My Brand Admin Panel"
+admin.site.index_title = "My Brand Admin"
 
 urlpatterns = [
     path('django-admin/', admin.site.urls),
@@ -86,9 +86,6 @@ urlpatterns = [
     path('seo/storefront/api/', include('nxtbn.seo.api.storefront.urls')),
     path('seo/dashboard/api/', include('nxtbn.seo.api.dashboard.urls')),
 
-    path('core/storefront/api/', include('nxtbn.core.api.storefront.urls')),
-    path('core/dashboard/api/', include('nxtbn.core.api.dashboard.urls')),
-
     path('shipping/dashboard/api/', include('nxtbn.shipping.api.dashboard.urls')),
 
     path('plugins/dashboard/api/', include('nxtbn.plugins.api.dashboard.urls')),
@@ -102,6 +99,8 @@ urlpatterns = [
     path('purchase/dashboard/api/', include('nxtbn.purchase.api.dashboard.urls')),
 
 ]
+
+from nxtbn.swagger_views import api_docs, DASHBOARD_API_DOCS_SCHEMA_VIEWS, STOREFRONT_API_DOCS_SCHEMA_VIEWS
 
 urlpatterns += [
     path('docs/', api_docs, name='api_docs'),

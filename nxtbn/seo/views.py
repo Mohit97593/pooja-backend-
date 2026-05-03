@@ -13,7 +13,7 @@ def robots_txt(request):
     sitemap_url = f"https://{site_domain}{sitemap_path}"
 
     content = (
-        "# We use nxtbn - Next Billion Native Commerce as our e-commerce platform that scales.\n"
+        "# We use My Brand as our e-commerce platform that scales.\n"
         "User-agent: *\n"
         "Disallow: /docs/\n" 
         "Disallow: /admin/\n"

@@ -183,11 +183,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'nxtbn.wsgi.application'
 
 
+import dj_database_url
+
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-
-if get_env_var('DATABASE_NAME', ''):
+if get_env_var('DATABASE_URL', ''):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=get_env_var('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+elif get_env_var('DATABASE_NAME', ''):
     DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -207,7 +216,7 @@ else:
     }
 
 # When test, use sqlute as test DB
-if sys.argv[1] == 'test':
+if len(sys.argv) > 1 and sys.argv[1] == 'test':
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),

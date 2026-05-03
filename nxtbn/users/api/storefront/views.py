@@ -72,6 +72,65 @@ class SignupView(generics.CreateAPIView):
 
 
 
+class LoginView(generics.GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = LoginRequestSerializer
+    authentication_classes = []
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.jwt_manager = JWTManager()
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        user = authenticate(email=email, password=password)
+        if user:
+            access_token = self.jwt_manager.generate_access_token(user)
+            refresh_token = self.jwt_manager.generate_refresh_token(user)
+
+            user_data = JwtBasicUserSerializer(user).data
+
+            response =  Response(
+                {
+                    "user": user_data,
+                    "token": {
+                        "access": access_token,
+                        "refresh": refresh_token,
+                        "expires_in": self.jwt_manager.access_token_expiration_seconds,
+                        "refresh_expires_in": self.jwt_manager.refresh_token_expiration_seconds,
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
+
+            response.set_cookie(
+                key=self.jwt_manager.access_token_cookie_name,
+                value=access_token,
+                httponly=True,
+                secure=True,
+                samesite="None",
+                max_age=self.jwt_manager.access_token_expiration,
+            )
+            response.set_cookie(
+                key=self.jwt_manager.refresh_token_cookie_name,
+                value=refresh_token,
+                httponly=True,
+                secure=True,
+                samesite="None",
+                max_age=self.jwt_manager.refresh_token_expiration,
+            )
+
+            return response
+
+        return Response({"detail": _("Invalid credentials")}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 class LogoutView(APIView):
     permission_classes = (AllowAny,)
 
