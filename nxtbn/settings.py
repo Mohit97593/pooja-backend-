@@ -60,6 +60,8 @@ DEBUG = get_env_var("DEBUG", default=False, var_type=bool)
 
 
 ALLOWED_HOSTS = get_env_var("ALLOWED_HOSTS", default=["*"], var_type=list)
+if os.environ.get('VERCEL'):
+    ALLOWED_HOSTS = ['*']
 
 DEVELOPMENT_SERVER = get_env_var("DEVELOPMENT_SERVER", default=False, var_type=bool)
 
@@ -156,10 +158,7 @@ MIDDLEWARE = [
 
 # INSTALLED_APPS[]corsheaders specific settings
 CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = False
-CORS_ALLOWED_ORIGINS = get_env_var("CORS_ALLOWED_ORIGINS", default=[
-    'http://localhost:3000',
-], var_type=list)
+CORS_ALLOW_ALL_ORIGINS = True 
 
 
 ROOT_URLCONF = 'nxtbn.urls'
