@@ -114,12 +114,17 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['get'], url_path='with-recommended') # list via single product
     def with_recommended(self, request, slug=None):
         product = self.get_object()
-        queryset = Product.objects.annotate(
-            similarity=TrigramSimilarity('name', product.name)
-        ).order_by('-similarity')[:20]
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        try:
+            queryset = Product.objects.annotate(
+                similarity=TrigramSimilarity('name', product.name)
+            ).order_by('-similarity')[:20]
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except Exception:
+            # Fallback if pg_trgm is not enabled or fails
+            queryset = Product.objects.filter(category=product.category).exclude(id=product.id)[:20]
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
     
     @action(detail=True, methods=['get'], url_path='with-image-list') # details
     def retrive_with_image_list(self, request, slug=None):
@@ -130,12 +135,16 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['get'], url_path='with-recommended/image-list') # list via single product
     def with_recommended_image_list(self, request, slug=None):
         product = self.get_object()
-        queryset = Product.objects.annotate(
-            similarity=TrigramSimilarity('name', product.name)
-        ).order_by('-similarity')[:20]
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        try:
+            queryset = Product.objects.annotate(
+                similarity=TrigramSimilarity('name', product.name)
+            ).order_by('-similarity')[:20]
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except Exception:
+            queryset = Product.objects.filter(category=product.category).exclude(id=product.id)[:20]
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
 
     
 class CollectionListView(generics.ListAPIView):
@@ -149,4 +158,3 @@ class CategoryListView(generics.ListAPIView):
     pagination_class = None
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
