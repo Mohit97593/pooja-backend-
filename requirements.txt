@@ -1,3 +1,4 @@
+setuptools
 django==4.2.11
 django-allauth==0.63.3
 django-extensions==3.2.3
@@ -24,4 +25,3 @@ pymemcache==4.0.0
 psutil
 graphene-django
 dj-database-url
-setuptools
