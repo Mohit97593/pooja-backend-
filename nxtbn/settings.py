@@ -129,6 +129,11 @@ HELPING_HAND_APPS = [
 
 INSTALLED_APPS += LOCAL_APPS + HELPING_HAND_APPS
 
+# Disable drf_yasg on Vercel to avoid pkg_resources error
+if os.environ.get('VERCEL'):
+    if 'drf_yasg' in INSTALLED_APPS:
+        INSTALLED_APPS.remove('drf_yasg')
+
 SITE_ID = 1  # Default site ID (not used in headless API setup).
 # In a headless API setup, a custom middleware will dynamically
 # determine the site ID based on the request's domain.

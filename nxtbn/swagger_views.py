@@ -1,15 +1,21 @@
 from django.shortcuts import render
 from django.urls import path, include
 from rest_framework.permissions import AllowAny
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
+try:
+    from drf_yasg.views import get_schema_view
+    from drf_yasg import openapi
+    DRF_YASG_INSTALLED = True
+except ImportError:
+    DRF_YASG_INSTALLED = False
 
-
-API_INFO = openapi.Info(
-    title="nxtbn API",
-    default_version="v1",
-    description="API documentation for nxtbn App",
-)
+if DRF_YASG_INSTALLED:
+    API_INFO = openapi.Info(
+        title="nxtbn API",
+        default_version="v1",
+        description="API documentation for nxtbn App",
+    )
+else:
+    API_INFO = None
 
 DASHBOARD_PATTERNS = [
     path('user/dashboard/api/', include('nxtbn.users.api.dashboard.urls')),
@@ -41,21 +47,23 @@ STOREFRONT_PATTERNS = [
 ]
 
 
-DASHBOARD_API_DOCS_SCHEMA_VIEWS = get_schema_view(
-    API_INFO,
-    public=True,
-    permission_classes=(AllowAny,),
-    patterns=DASHBOARD_PATTERNS
-)
+if DRF_YASG_INSTALLED:
+    DASHBOARD_API_DOCS_SCHEMA_VIEWS = get_schema_view(
+        API_INFO,
+        public=True,
+        permission_classes=(AllowAny,),
+        patterns=DASHBOARD_PATTERNS
+    )
 
-
-
-STOREFRONT_API_DOCS_SCHEMA_VIEWS = get_schema_view(
-    API_INFO,
-    public=True,
-    permission_classes=(AllowAny,),
-    patterns=STOREFRONT_PATTERNS
-)
+    STOREFRONT_API_DOCS_SCHEMA_VIEWS = get_schema_view(
+        API_INFO,
+        public=True,
+        permission_classes=(AllowAny,),
+        patterns=STOREFRONT_PATTERNS
+    )
+else:
+    DASHBOARD_API_DOCS_SCHEMA_VIEWS = None
+    STOREFRONT_API_DOCS_SCHEMA_VIEWS = None
 
 
 def api_docs(request):
