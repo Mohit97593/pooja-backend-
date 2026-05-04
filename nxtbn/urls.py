@@ -98,9 +98,31 @@ urlpatterns = [
 
     path('purchase/dashboard/api/', include('nxtbn.purchase.api.dashboard.urls')),
 
-    # Temporary route to run migrations on Vercel
-    path('run-migrations/', lambda r: HttpResponse(os.popen('python manage.py migrate').read(), content_type="text/plain")),
+    # Temporary routes for Vercel setup
+    path('run-migrations/', lambda r: HttpResponse(migrate_db(), content_type="text/plain")),
+    path('create-admin/', lambda r: HttpResponse(create_superuser(), content_type="text/plain")),
 ]
+
+def migrate_db():
+    from django.core.management import call_command
+    import io
+    out = io.StringIO()
+    try:
+        call_command('migrate', stdout=out)
+        return "Migrations successful:\n" + out.getvalue()
+    except Exception as e:
+        return "Migration failed: " + str(e)
+
+def create_superuser():
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    try:
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
+            return "Superuser 'admin' created successfully with password 'admin123'"
+        return "Superuser 'admin' already exists"
+    except Exception as e:
+        return "Error creating superuser: " + str(e)
 
 if os.environ.get('VERCEL') is None:
     try:
