@@ -17,7 +17,12 @@ logger = logging.getLogger(__name__)
 
 PLUGIN_BASE_DIR = getattr(settings, 'PLUGIN_BASE_DIR')
 
-os.makedirs(PLUGIN_BASE_DIR, exist_ok=True)
+try:
+    os.makedirs(PLUGIN_BASE_DIR, exist_ok=True)
+except OSError:
+    # On read-only file systems like Vercel, we can't create directories.
+    # We ignore this error as the directory should either exist or is not needed for runtime.
+    pass
 
 def get_module_path(module_name):
     spec = importlib.util.find_spec(module_name)
