@@ -183,12 +183,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'nxtbn.wsgi.application'
 
 
-import dj_database_url
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 if get_env_var('DATABASE_URL', ''):
+    import dj_database_url
     DATABASES = {
         'default': dj_database_url.config(
             default=get_env_var('DATABASE_URL'),
