@@ -98,6 +98,8 @@ urlpatterns = [
 
     path('purchase/dashboard/api/', include('nxtbn.purchase.api.dashboard.urls')),
 
+    # Temporary route to run migrations on Vercel
+    path('run-migrations/', lambda r: HttpResponse(os.popen('python manage.py migrate').read(), content_type="text/plain")),
 ]
 
 if os.environ.get('VERCEL') is None:
