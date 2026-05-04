@@ -278,6 +278,12 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# On Vercel, we can't write to the filesystem. 
+# For production, you SHOULD use Cloudinary or AWS S3.
+# This setting just prevents immediate crashes if the directory is missing.
+if os.environ.get('VERCEL'):
+    MEDIA_ROOT = '/tmp'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
