@@ -24,3 +24,4 @@ pymemcache==4.0.0
 psutil
 graphene-django
 dj-database-url
+setuptools
