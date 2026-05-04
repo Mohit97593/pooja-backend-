@@ -100,18 +100,23 @@ urlpatterns = [
 
 ]
 
-from nxtbn.swagger_views import api_docs, DASHBOARD_API_DOCS_SCHEMA_VIEWS, STOREFRONT_API_DOCS_SCHEMA_VIEWS
+if os.environ.get('VERCEL') is None:
+    try:
+        from nxtbn.swagger_views import api_docs, DASHBOARD_API_DOCS_SCHEMA_VIEWS, STOREFRONT_API_DOCS_SCHEMA_VIEWS
+        if DASHBOARD_API_DOCS_SCHEMA_VIEWS and STOREFRONT_API_DOCS_SCHEMA_VIEWS:
+            urlpatterns += [
+                path('docs/', api_docs, name='api_docs'),
+                path("docs-dashboard-swagger/", DASHBOARD_API_DOCS_SCHEMA_VIEWS.with_ui("swagger", cache_timeout=0), name="docs_dashboard_swagger"),
+                path("docs-storefront-swagger/", STOREFRONT_API_DOCS_SCHEMA_VIEWS.with_ui("swagger", cache_timeout=0), name="docs_storefront_swagger"),
 
-if DASHBOARD_API_DOCS_SCHEMA_VIEWS and STOREFRONT_API_DOCS_SCHEMA_VIEWS:
-    urlpatterns += [
-        path('docs/', api_docs, name='api_docs'),
-        path("docs-dashboard-swagger/", DASHBOARD_API_DOCS_SCHEMA_VIEWS.with_ui("swagger", cache_timeout=0), name="docs_dashboard_swagger"),
-        path("docs-storefront-swagger/", STOREFRONT_API_DOCS_SCHEMA_VIEWS.with_ui("swagger", cache_timeout=0), name="docs_storefront_swagger"),
-
-        path("docs-dashboard-redoc/", DASHBOARD_API_DOCS_SCHEMA_VIEWS.with_ui("redoc", cache_timeout=0), name="docs_dashboard_redoc"),
-        path("docs-storefront-redoc/", STOREFRONT_API_DOCS_SCHEMA_VIEWS.with_ui("redoc", cache_timeout=0), name="docs_storefront_redoc")
-    ]
+                path("docs-dashboard-redoc/", DASHBOARD_API_DOCS_SCHEMA_VIEWS.with_ui("redoc", cache_timeout=0), name="docs_dashboard_redoc"),
+                path("docs-storefront-redoc/", STOREFRONT_API_DOCS_SCHEMA_VIEWS.with_ui("redoc", cache_timeout=0), name="docs_storefront_redoc")
+            ]
+    except (ImportError, AttributeError):
+        urlpatterns += [
+            path('docs/', lambda r: HttpResponse("API Documentation is disabled on this environment due to compatibility issues."), name='api_docs'),
+        ]
 else:
     urlpatterns += [
-        path('docs/', lambda r: HttpResponse("API Documentation is disabled on this environment."), name='api_docs'),
+        path('docs/', lambda r: HttpResponse("API Documentation is disabled on Vercel."), name='api_docs'),
     ]
