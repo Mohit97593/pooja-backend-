@@ -187,14 +187,19 @@ WSGI_APPLICATION = 'nxtbn.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 if get_env_var('DATABASE_URL', ''):
-    import dj_database_url
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=get_env_var('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
+    try:
+        import dj_database_url
+    except ImportError:
+        dj_database_url = None
+    
+    if dj_database_url:
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=get_env_var('DATABASE_URL'),
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
 elif get_env_var('DATABASE_NAME', ''):
     DATABASES = {
     'default': {
